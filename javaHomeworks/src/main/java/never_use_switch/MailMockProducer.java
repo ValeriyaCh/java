@@ -6,6 +6,9 @@ import org.fluttercode.datafactory.impl.DataFactory;
 import org.reflections.Reflections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static never_use_switch.RandomUtil.randomItem;
 
 /**
@@ -22,15 +25,31 @@ public class MailMockProducer {
         classes = new ArrayList<>(scanner.getSubTypesOf(Mail.class));
         return classes;
     }
+    public static int parseName(String className){
+        Pattern p = Pattern.compile("\\d+");
+        Matcher m = p.matcher(className);
+        int res = 0;
+        while (m.find()) {
+             res = Integer.parseInt(m.group());
+        }
+        return res;
+    }
 
     @SneakyThrows
     public void sendMailsForever()  {
         List<Class<? extends Mail>> listOfMails = parseTypes();
+        Mail mailToSend = null;
         while (true) {
-            Mail mailToSend = randomItem(listOfMails).getDeclaredConstructor().newInstance();
+            int mailType = RandomUtil.getIntBetween(0, listOfMails.size()) + 1;
+            for (int i=0;i<listOfMails.size();i++){
+                if (parseName(listOfMails.get(i).toString()) == mailType){
+                    mailToSend = listOfMails.get(i).getDeclaredConstructor().newInstance();
+                    break;
+                }
+            }
             MailInfo mailInfo = MailInfo.builder()
                     .email(dataFactory.getEmailAddress())
-                    .mailType(mailToSend.getCode())
+                    .mailType(mailType)
                     .text(faker.chuckNorris().fact()).build();
             mailToSend.sendMailInfo(mailInfo);
             Thread.sleep(1000);
