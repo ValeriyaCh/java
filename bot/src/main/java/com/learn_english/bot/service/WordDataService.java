@@ -3,11 +3,11 @@ package com.learn_english.bot.service;
 import com.learn_english.bot.dao.WordMongoDao;
 import com.learn_english.bot.model.Word;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WordDataService {
@@ -30,8 +30,20 @@ public class WordDataService {
         wordMongoDao.delete(word);
     }
 
-    public Optional<Word> getWordById(int id){
-        return wordMongoDao.findById(id);
+    public boolean existByRussianWord(String russianWord){
+        return wordMongoDao.existsByRussianWord(russianWord);
+    }
+    public Word getWordById (int id){
+        return wordMongoDao.getWordById(id);
+    }
+
+    public Word findByRussianWord(String russianWord){
+        return wordMongoDao.findByRussianWord(russianWord);
+    }
+    public void checkWordOrAdd (Pair<String,String> word) {
+        if (!wordMongoDao.existsByRussianWord(word.getFirst())) {
+            wordMongoDao.save(new Word(word.getFirst(), word.getSecond()));
+        }
     }
 
 

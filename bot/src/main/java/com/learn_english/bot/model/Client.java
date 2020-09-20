@@ -19,5 +19,13 @@ public class Client implements Serializable {
     String name;
     List<Integer> wordsIds;
 
+    public Client(int id) {
+        this.id = id;
+    }
+
+    public void addId (int id){
+        wordsIds.add(id);
+    }
+
 
 }
